@@ -1,95 +1,89 @@
-// const accountSid = '' // El id de tu cuenta; 
-// const authToken = '' // El TOKEN de tu cuenta; 
-const accountSid = '' // El id de tu cuenta Patmed; 
-const authToken = '' // El TOKEN de tu cuenta Patmed; 
-const client = require('twilio')(accountSid, authToken);
+// const accountSid = '' // El id de tu cuenta;
+// const authToken = '' // El TOKEN de tu cuenta;
+const accountSid = process.env.TWILIO_ACCOUNT_SID; // El id de tu cuenta Patmed;
+const authToken = process.env.TWILIO_AUTH_TOKEN; // El TOKEN de tu cuenta Patmed;
+const client = require("twilio")(accountSid, authToken);
 
+const sendMessage = async (req, res) => {
+  try {
+    const { number, message } = req.body;
 
+    const response = await client.messages.create({
+      body: message,
+      from: "+14023472425", // El número que te proporcionen
+      to: `${number}`,
+    });
 
-const sendMessage = async(req, res) => {
-    try {
+    console.log(response);
 
-        const { number, message } = req.body;
+    res.json({
+      msg: "Success",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      msg: "Error",
+    });
+  }
+};
 
-        const response = await client.messages.create({
-            body: message,
-            from: '+14023472425', // El número que te proporcionen       
-            to: `${number}`,
-            tittle: "Patmed"
-        });
+const sendMessageWhatsapp = async (req, res) => {
+  try {
+    const { number, message } = req.body;
 
-        console.log(response);
+    const response = await client.messages.create({
+      body: message,
+      from: "whatsapp:+14155238886", // El número que te proporcionen
+      to: `whatsapp:${number}`,
+    });
 
-        res.json({
-            msg: 'Success'
-        });
+    console.log(response);
 
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            msg: 'Error'
-        });
-    }
-}
+    res.json({
+      msg: "Success!",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      msg: "Error",
+    });
+  }
+};
 
-const sendMessageWhatsapp = async(req, res) => {
-    try {
+const sendBulkMessages = async (req, res) => {
+  console.log("req.body:", req.body);
+  let messageBody = req.body.body;
+  let numberList = req.body.toBinding;
+  console.log(`Body: ${messageBody}`);
+  var numbers = [];
+  for (let i = 0; i < numberList.length; i++) {
+    numbers.push(
+      JSON.stringify({
+        binding_type: "sms",
+        address: numberList[i],
+      })
+    );
+  }
 
-        const { number, message } = req.body;
+  const notificationOpts = {
+    toBinding: numbers,
+    body: messageBody,
+  };
 
-        const response = await client.messages.create({
-            body: message,
-            from: 'whatsapp:+14155238886', // El número que te proporcionen       
-            to: `whatsapp:${number}`
-        });
+  console.log("numbers:", notificationOpts.toBinding);
+  console.log("body", notificationOpts.body);
 
-        console.log(response);
+  const response = await client.notify
+    .services(process.env.SERVICE_SID)
+    .notifications.create(notificationOpts)
+    .then((notification) => console.log("notification.sid", notification.sid))
+    .catch((error) => console.log(error));
 
-        res.json({
-            msg: 'Success!'
-        });
+  console.log(response);
 
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            msg: 'Error'
-        });
-    }
-}
+  res.json({
+    msg: "Message sent successfully",
+  });
+};
 
-const sendBulkMessages = async(req, res) => {
-     console.log('req.body:', req.body);
-            let messageBody = req.body.body;
-            let numberList = req.body.toBinding;
-            var numbers = [];
-            for (let i = 0; i < numberList.length; i++) {
-                numbers.push(JSON.stringify({
-                    binding_type: 'sms',
-                    address: numberList[i]
-                }))
-            }
-
-
-            const notificationOpts = {
-                toBinding: numbers,
-                body: messageBody,
-            };
-
-            console.log('numbers:',notificationOpts.toBinding);
-            console.log('body', notificationOpts.body);
-
-            const response = await this.client.notify
-                .services(process.env.SERVICE_SID)
-                .notifications.create(notificationOpts)
-                .then(notification => console.log('notification.sid',notification.sid))
-                .catch(error => console.log(error));
-
-            console.log(response);
-
-            res.json({
-                msg: 'Message sent successfully'
-            });
-}
-
-
-module.exports = sendMessage, sendMessageWhatsapp, sendBulkMessages;
+module.exports = { sendMessage, sendMessageWhatsapp, sendBulkMessages };
