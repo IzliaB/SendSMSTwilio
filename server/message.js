@@ -59,35 +59,38 @@ const sendMessageWhatsapp = async(req, res) => {
 }
 
 const sendBulkMessages = async(req, res) => {
-    let messageBody = req.body.body;
-    let numberList = req.body.numbers;
-    var numbers = [];
-    for (i = 0; i < numberList.length; i++) {
-        numbers.push(JSON.stringify({
-            binding_type: 'sms',
-            address: numberList[i]
-        }))
-    }
+     console.log('req.body:', req.body);
+            let messageBody = req.body.body;
+            let numberList = req.body.toBinding;
+            var numbers = [];
+            for (let i = 0; i < numberList.length; i++) {
+                numbers.push(JSON.stringify({
+                    binding_type: 'sms',
+                    address: numberList[i]
+                }))
+            }
 
 
-    const notificationOpts = {
-        toBinding: numbers,
-        body: messageBody,
-    };
+            const notificationOpts = {
+                toBinding: numbers,
+                body: messageBody,
+            };
 
-    const response = await client.notify
-        .services(SERVICE_SID)
-        .notifications.create(notificationOpts)
-        .then(notification => console.log(notification.sid))
-        .catch(error => console.log(error));
+            console.log('numbers:',notificationOpts.toBinding);
+            console.log('body', notificationOpts.body);
 
-    console.log(response);
+            const response = await this.client.notify
+                .services(process.env.SERVICE_SID)
+                .notifications.create(notificationOpts)
+                .then(notification => console.log('notification.sid',notification.sid))
+                .catch(error => console.log(error));
 
-    res.json({
-        msg: 'Message sent successfully'
-    });
+            console.log(response);
+
+            res.json({
+                msg: 'Message sent successfully'
+            });
 }
-
 
 
 module.exports = sendMessage, sendMessageWhatsapp, sendBulkMessages;
