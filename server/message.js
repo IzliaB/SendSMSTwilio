@@ -1,5 +1,5 @@
-// const accountSid = 'AC493b57f017417a7b1a79225b38d43fa6' // El id de tu cuenta; 
-// const authToken = '6f627554365489744095bfe49cdc3f48' // El TOKEN de tu cuenta; 
+// const accountSid = '' // El id de tu cuenta; 
+// const authToken = '' // El TOKEN de tu cuenta; 
 const accountSid = '' // El id de tu cuenta Patmed; 
 const authToken = '' // El TOKEN de tu cuenta Patmed; 
 const SERVICE_SID = 'MGfb'
