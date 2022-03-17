@@ -2,7 +2,6 @@
 // const authToken = '' // El TOKEN de tu cuenta; 
 const accountSid = '' // El id de tu cuenta Patmed; 
 const authToken = '' // El TOKEN de tu cuenta Patmed; 
-const SERVICE_SID = 'MGfb'
 const client = require('twilio')(accountSid, authToken);
 
 
